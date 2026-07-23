@@ -41,6 +41,7 @@ import org.dolphinemu.dolphinemu.features.infinitybase.model.Figure
 import org.dolphinemu.dolphinemu.features.infinitybase.ui.FigureSlot
 import org.dolphinemu.dolphinemu.features.infinitybase.ui.FigureSlotAdapter
 import org.dolphinemu.dolphinemu.features.input.model.ControllerInterface
+import org.dolphinemu.dolphinemu.cannoli.DelfinoIgmHost
 import org.dolphinemu.dolphinemu.features.input.model.DolphinSensorEventListener
 import org.dolphinemu.dolphinemu.features.settings.model.BooleanSetting
 import org.dolphinemu.dolphinemu.features.settings.model.IntSetting
@@ -75,6 +76,8 @@ class EmulationActivity : AppCompatActivity(), ThemeProvider {
     override var themeId = 0
 
     private var menuVisible = false
+
+    private val delfinoIgm = DelfinoIgmHost(this)
 
     var isActivityRecreated = false
     private var paths: Array<String>? = null
@@ -245,6 +248,8 @@ class EmulationActivity : AppCompatActivity(), ThemeProvider {
                 add(FigureSlot(getString(R.string.infinity_p2a2_label), 8))
             }
         }
+
+        delfinoIgm.onCreate(savedInstanceState) { toggleMenu() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -312,11 +317,14 @@ class EmulationActivity : AppCompatActivity(), ThemeProvider {
         }
 
         DolphinSensorEventListener.setDeviceRotation(windowManager.defaultDisplay.rotation)
+
+        delfinoIgm.onResume()
     }
 
     override fun onStop() {
         super.onStop()
         settings.saveSettings()
+        delfinoIgm.onStop()
     }
 
     fun onTitleChanged() {
@@ -341,6 +349,7 @@ class EmulationActivity : AppCompatActivity(), ThemeProvider {
     override fun onDestroy() {
         super.onDestroy()
         settings.close()
+        delfinoIgm.onDestroy()
     }
 
     override fun onBackPressed() {
@@ -542,6 +551,7 @@ class EmulationActivity : AppCompatActivity(), ThemeProvider {
 
     // Gets button presses
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (delfinoIgm.handleKeyEvent(event)) return true
         if (!menuVisible) {
             if (ControllerInterface.dispatchKeyEvent(event)) {
                 return true
