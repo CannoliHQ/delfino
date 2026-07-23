@@ -134,3 +134,7 @@
 	path = Externals/wil
 	url = https://github.com/microsoft/wil.git
 	shallow = true
+[submodule "Externals/cannoli"]
+	path = Externals/cannoli
+	url = git@github.com:CannoliHQ/cannoli.git
+	branch = main

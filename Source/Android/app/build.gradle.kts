@@ -35,9 +35,13 @@ android {
         //disable "ExtraTranslation"
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     defaultConfig {
-        applicationId = "org.dolphinemu.dolphinemu"
-        minSdk = 24
+        applicationId = "dev.cannoli.delfino"
+        minSdk = 28
         targetSdk = 37
 
         versionCode = getBuildVersionCode()
@@ -69,7 +73,7 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
 
-            resValue("string", "app_name_suffixed", "Dolphin Emulator")
+            resValue("string", "app_name_suffixed", "Delfino")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -81,7 +85,7 @@ android {
         // Signed by debug key disallowing distribution on Play Store.
         // Attaches "debug" suffix to version and package name, allowing installation alongside the release build.
         debug {
-            resValue("string", "app_name_suffixed", "Dolphin Debug")
+            resValue("string", "app_name_suffixed", "Delfino Debug")
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             isJniDebuggable = true
@@ -165,6 +169,12 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
+
+    // Cannoli in-game menu (shared module from Externals/cannoli)
+    implementation(project(":cannoli-igm"))
+
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 }
 
 fun getGitVersion(): String {
