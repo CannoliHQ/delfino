@@ -369,6 +369,12 @@ JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_SetCacheDire
   File::SetUserPath(D_CACHE_IDX, GetJString(env, jDirectory));
 }
 
+JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_SetStateSavesDirectory(
+    JNIEnv* env, jclass, jstring jDirectory)
+{
+  File::SetUserPath(D_STATESAVES_IDX, GetJString(env, jDirectory));
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_dolphinemu_dolphinemu_NativeLibrary_GetCacheDirectory(JNIEnv* env, jclass)
 {

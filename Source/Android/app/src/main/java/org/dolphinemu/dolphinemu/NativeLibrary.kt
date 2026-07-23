@@ -283,6 +283,9 @@ object NativeLibrary {
     external fun SetCacheDirectory(directory: String)
 
     @JvmStatic
+    external fun SetStateSavesDirectory(path: String)
+
+    @JvmStatic
     external fun GetCacheDirectory(): String
 
     @JvmStatic
