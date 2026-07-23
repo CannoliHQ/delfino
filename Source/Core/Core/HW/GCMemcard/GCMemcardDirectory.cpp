@@ -39,16 +39,39 @@
 
 static const char* MC_HDR = "MC_SYSTEM_AREA";
 
+static std::string_view StripAtNull(std::string_view s)
+{
+  const auto offset = s.find('\0');
+  if (offset == std::string_view::npos)
+    return s;
+  return s.substr(0, offset);
+}
+
+// Decode a DEntry text field to UTF-8 for use in a GCI filename. When the platform's iconv
+// lacks the source encoding (Android's bionic iconv has no CP1252 or SJIS), the decoder returns
+// an empty string; fall back to the raw bytes with unprintable characters dropped so the
+// filename stays meaningful instead of collapsing to "--.gci".
+static std::string DecodeGCIComponent(std::string_view raw,
+                                      std::string (*string_decoder)(std::string_view))
+{
+  std::string decoded(StripAtNull(string_decoder(raw)));
+  if (!decoded.empty())
+    return decoded;
+
+  std::string fallback;
+  for (const char c : StripAtNull(raw))
+  {
+    const auto byte = static_cast<unsigned char>(c);
+    if (byte >= 0x20 && byte < 0x7f)
+      fallback += c;
+  }
+  return fallback;
+}
+
 static std::string GenerateDefaultGCIFilename(const Memcard::DEntry& entry,
                                               bool card_encoding_is_shift_jis)
 {
   const auto string_decoder = card_encoding_is_shift_jis ? SHIFTJISToUTF8 : CP1252ToUTF8;
-  const auto strip_null = [](const std::string_view& s) {
-    const auto offset = s.find('\0');
-    if (offset == std::string_view::npos)
-      return s;
-    return s.substr(0, offset);
-  };
 
   const std::string_view makercode(reinterpret_cast<const char*>(entry.m_makercode.data()),
                                    entry.m_makercode.size());
@@ -56,9 +79,9 @@ static std::string GenerateDefaultGCIFilename(const Memcard::DEntry& entry,
                                   entry.m_gamecode.size());
   const std::string_view filename(reinterpret_cast<const char*>(entry.m_filename.data()),
                                   entry.m_filename.size());
-  return Common::EscapeFileName(fmt::format("{}-{}-{}.gci", strip_null(string_decoder(makercode)),
-                                            strip_null(string_decoder(gamecode)),
-                                            strip_null(string_decoder(filename))));
+  return Common::EscapeFileName(fmt::format("{}-{}-{}.gci", DecodeGCIComponent(makercode, string_decoder),
+                                            DecodeGCIComponent(gamecode, string_decoder),
+                                            DecodeGCIComponent(filename, string_decoder)));
 }
 
 bool GCMemcardDirectory::LoadGCI(Memcard::GCIFile gci)
