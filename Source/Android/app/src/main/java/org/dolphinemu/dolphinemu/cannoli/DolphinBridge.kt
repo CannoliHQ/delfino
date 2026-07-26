@@ -22,17 +22,20 @@ class NativeConfigDolphinConfig : DolphinConfig {
 
 /**
  * Bridges the shared Cannoli IGM to Dolphin. v1 wires the directly supported operations; undo,
- * state thumbnails, achievements, and multi-disc are behind capability flags or stubbed and can be
- * filled in later. onOpenNativeMenu is supplied by EmulationActivity to reach Dolphin's own menu.
+ * state thumbnails, and achievements are behind capability flags or stubbed and can be filled in
+ * later. onOpenNativeMenu is supplied by EmulationActivity to reach Dolphin's own menu.
  */
 class DolphinBridge(
     context: Context,
     private val onOpenNativeMenu: () -> Unit,
     private val onQuit: () -> Unit = {},
+    discPaths: List<String> = emptyList(),
+    changeDisc: (String) -> Unit = NativeLibrary::ChangeDisc,
 ) : EmulatorBridge {
 
     private val prefs = context.getSharedPreferences("delfino_igm_toggles", Context.MODE_PRIVATE)
     private var onNativeMenuClosed: (() -> Unit)? = null
+    private val discSwitcher = DiscSwitcher(discPaths, changeDisc)
 
     override val supportsNativeMenu = true
     override val supportsAchievements = false
@@ -66,10 +69,10 @@ class DolphinBridge(
 
     override fun getAchievements(): List<AchievementInfo> = emptyList()
 
-    override fun getDiskCount() = 1
-    override fun getDiskIndex() = 0
-    override fun setDiskIndex(index: Int) {}
-    override fun getDiskLabel(index: Int): String? = null
+    override fun getDiskCount() = discSwitcher.getDiskCount()
+    override fun getDiskIndex() = discSwitcher.getDiskIndex()
+    override fun setDiskIndex(index: Int) = discSwitcher.setDiskIndex(index)
+    override fun getDiskLabel(index: Int): String? = discSwitcher.getDiskLabel(index)
 
     override fun openNativeMenu() = onOpenNativeMenu()
     override fun openAchievementsMenu() = onOpenNativeMenu()

@@ -19,7 +19,12 @@ class DelfinoIgmHost(private val activity: FragmentActivity) {
         val params = DelfinoSession.params ?: return
         triggerKeycodes = params.igmTriggerKeycodes.toSet()
 
-        val bridge = DolphinBridge(activity, onOpenNativeMenu, onQuit = ::onQuitRequested)
+        val bridge = DolphinBridge(
+            activity,
+            onOpenNativeMenu,
+            onQuit = ::onQuitRequested,
+            discPaths = params.discPaths,
+        )
         val controller = IGMOverlayController(
             activity,
             bridge,
