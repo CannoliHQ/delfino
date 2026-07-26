@@ -4,7 +4,21 @@ import android.content.Context
 import android.graphics.Bitmap
 import dev.cannoli.igm.AchievementInfo
 import dev.cannoli.igm.EmulatorBridge
+import dev.cannoli.igm.IgmSettingsProvider
 import org.dolphinemu.dolphinemu.NativeLibrary
+import org.dolphinemu.dolphinemu.features.settings.model.NativeConfig
+
+// Global (non-game-specific) reads/writes, matching how Dolphin's own GFX settings screen
+// reads and persists settings: LAYER_ACTIVE for reads, LAYER_BASE_OR_CURRENT for writes (so
+// changes apply live to the running game), LAYER_BASE for save (see Settings.saveSettings()).
+class NativeConfigDolphinConfig : DolphinConfig {
+    override fun getInt(file: String, section: String, key: String, default: Int): Int =
+        NativeConfig.getInt(NativeConfig.LAYER_ACTIVE, file, section, key, default)
+    override fun setInt(file: String, section: String, key: String, value: Int) {
+        NativeConfig.setInt(NativeConfig.LAYER_BASE_OR_CURRENT, file, section, key, value)
+    }
+    override fun save() { NativeConfig.save(NativeConfig.LAYER_BASE) }
+}
 
 /**
  * Bridges the shared Cannoli IGM to Dolphin. v1 wires the directly supported operations; undo,
@@ -59,6 +73,9 @@ class DolphinBridge(
 
     override fun openNativeMenu() = onOpenNativeMenu()
     override fun openAchievementsMenu() = onOpenNativeMenu()
+
+    override fun settingsProvider(): IgmSettingsProvider =
+        DolphinIgmSettingsProvider(NativeConfigDolphinConfig(), onOpenNativeMenu)
 
     override fun setOnNativeMenuClosed(callback: () -> Unit) {
         onNativeMenuClosed = callback
