@@ -316,6 +316,12 @@ object NativeLibrary {
     external fun ResetDolphinSettings()
 
     /**
+     * Taps the emulated console's reset button.
+     */
+    @JvmStatic
+    external fun ResetEmulation()
+
+    /**
      * Initializes the native parts of the app.
      *
      * Should be called at app start before running any other native code

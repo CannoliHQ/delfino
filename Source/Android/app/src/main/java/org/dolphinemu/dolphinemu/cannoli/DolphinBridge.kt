@@ -45,10 +45,7 @@ class DolphinBridge(
     // the IGM passes a 0-based or auto-inclusive index, adjust only this function.
     private fun toDolphinSlot(slot: Int): Int = slot
 
-    override fun reset() {
-        // Dolphin's Android NativeLibrary exposes no in-place reset in v1. No-op for now; a thin
-        // JNI reset can be added later if the IGM's Reset entry is wanted.
-    }
+    override fun reset() = NativeLibrary.ResetEmulation()
 
     override fun quit() {
         onQuit()
