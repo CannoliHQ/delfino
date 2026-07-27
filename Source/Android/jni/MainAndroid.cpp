@@ -329,6 +329,16 @@ JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_LoadStateAs(
   State::LoadAs(Core::System::GetInstance(), GetJString(env, path));
 }
 
+JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_UndoLoadState(JNIEnv*, jclass)
+{
+  State::UndoLoadState(Core::System::GetInstance());
+}
+
+JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_UndoSaveState(JNIEnv*, jclass)
+{
+  State::UndoSaveState(Core::System::GetInstance());
+}
+
 JNIEXPORT jlong JNICALL
 Java_org_dolphinemu_dolphinemu_NativeLibrary_GetUnixTimeOfStateSlot(JNIEnv*, jclass, jint slot)
 {

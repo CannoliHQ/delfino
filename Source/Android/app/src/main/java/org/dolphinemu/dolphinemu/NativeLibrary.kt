@@ -262,6 +262,18 @@ object NativeLibrary {
     external fun LoadStateAs(path: String)
 
     /**
+     * Undoes the last load state, restoring the state that existed before it was loaded.
+     */
+    @JvmStatic
+    external fun UndoLoadState()
+
+    /**
+     * Undoes the last save state, restoring the state that existed before it was saved.
+     */
+    @JvmStatic
+    external fun UndoSaveState()
+
+    /**
      * Returns when the savestate in the given slot was created, or 0 if the slot is empty.
      */
     @JvmStatic

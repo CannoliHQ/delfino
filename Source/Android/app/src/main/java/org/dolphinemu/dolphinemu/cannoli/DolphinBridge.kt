@@ -21,9 +21,9 @@ class NativeConfigDolphinConfig : DolphinConfig {
 }
 
 /**
- * Bridges the shared Cannoli IGM to Dolphin. v1 wires the directly supported operations; undo,
- * state thumbnails, and achievements are behind capability flags or stubbed and can be filled in
- * later. onOpenNativeMenu is supplied by EmulationActivity to reach Dolphin's own menu.
+ * Bridges the shared Cannoli IGM to Dolphin. v1 wires the directly supported operations; state
+ * thumbnails and achievements are behind capability flags or stubbed and can be filled in later.
+ * onOpenNativeMenu is supplied by EmulationActivity to reach Dolphin's own menu.
  */
 class DolphinBridge(
     context: Context,
@@ -39,7 +39,7 @@ class DolphinBridge(
 
     override val supportsNativeMenu = true
     override val supportsAchievements = false
-    override val supportsUndo = false
+    override val supportsUndo = true
 
     // Dolphin uses 1-based numbered state slots and has no "auto" slot. If on-device testing shows
     // the IGM passes a 0-based or auto-inclusive index, adjust only this function.
@@ -60,8 +60,8 @@ class DolphinBridge(
 
     override fun saveState(slot: Int) = NativeLibrary.SaveState(toDolphinSlot(slot))
     override fun loadState(slot: Int) = NativeLibrary.LoadState(toDolphinSlot(slot))
-    override fun undoSaveState() {}
-    override fun undoLoadState() {}
+    override fun undoSaveState() = NativeLibrary.UndoSaveState()
+    override fun undoLoadState() = NativeLibrary.UndoLoadState()
     override fun getStateSlotCount() = 10
     override fun getStateThumbnail(slot: Int): Bitmap? = null
     override fun stateExists(slot: Int): Boolean =
