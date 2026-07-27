@@ -18,7 +18,6 @@ object DolphinOptionCatalog {
             label = "Internal Resolution",
             file = "GFX", section = "Settings", configKey = "InternalResolution", default = 1,
             options = listOf(
-                0 to "Auto",
                 1 to "Native (1x)",
                 2 to "2x",
                 3 to "3x",
